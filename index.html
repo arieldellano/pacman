@@ -247,10 +247,10 @@ function buildWalls(color, glow) {
   for (let r = 0; r < ROWS; r++) for (let c2 = 0; c2 < COLS; c2++) {
     if (MAZE[r][c2] !== '#') continue;
     const px = c2 * T, py = r * T;
-    if (!open(c2, r - 1)) { x.beginPath(); x.moveTo(px + 2, py + 2); x.lineTo(px + T - 2, py + 2); x.stroke(); }
-    if (!open(c2, r + 1)) { x.beginPath(); x.moveTo(px + 2, py + T - 2); x.lineTo(px + T - 2, py + T - 2); x.stroke(); }
-    if (!open(c2 - 1, r)) { x.beginPath(); x.moveTo(px + 2, py + 2); x.lineTo(px + 2, py + T - 2); x.stroke(); }
-    if (!open(c2 + 1, r)) { x.beginPath(); x.moveTo(px + T - 2, py + 2); x.lineTo(px + T - 2, py + T - 2); x.stroke(); }
+    if (open(c2, r - 1)) { x.beginPath(); x.moveTo(px + 2, py + 2); x.lineTo(px + T - 2, py + 2); x.stroke(); }
+    if (open(c2, r + 1)) { x.beginPath(); x.moveTo(px + 2, py + T - 2); x.lineTo(px + T - 2, py + T - 2); x.stroke(); }
+    if (open(c2 - 1, r)) { x.beginPath(); x.moveTo(px + 2, py + 2); x.lineTo(px + 2, py + T - 2); x.stroke(); }
+    if (open(c2 + 1, r)) { x.beginPath(); x.moveTo(px + T - 2, py + 2); x.lineTo(px + T - 2, py + T - 2); x.stroke(); }
   }
   return c;
 }

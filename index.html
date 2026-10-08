@@ -55,7 +55,7 @@ body {
     <div id="right"><div class="lab">HIGH</div><div class="val" id="high">0</div></div>
   </div>
   <div id="stage">
-    <canvas id="c" width="336" height="336"></canvas>
+    <canvas id="c" width="448" height="496"></canvas>
     <div id="overlay">
       <div id="otitle"></div>
       <div id="osub"></div>
@@ -68,31 +68,41 @@ body {
 </div>
 <script>
 'use strict';
-const T = 16, COLS = 21, ROWS = 21;
+const T = 16, COLS = 28, ROWS = 31;
 const MAZE = [
-  "#####################",
-  "#.........#.........#",
-  "#o##.####...####.##o#",
-  "#...................#",
-  "#.##.#....#....#.##.#",
-  "#....#...#.#...#....#",
-  "####.####...####.####",
-  "####.#.....#...#.####",
-  "#.......## ##.......#",
-  "#.......#ggg#.......#",
-  "#.......#####.......#",
-  "#.........#.........#",
-  "#o##.####...####.##o#",
-  "#.##.#.........#.##.#",
-  "####.#####.#####.####",
-  "##...####...####...##",
-  "#....#.........#.#..#",
-  "#.##.#...#.#####.##.#",
-  "#.#.######.########.#",
-  "#....##.......##....#",
-  "#####################"
+  "############################",
+  "#..o.........##........o...#",
+  "#.####.#####.##.#####.####.#",
+  "#.####.#####.##.#####.####.#",
+  "#.####.#####.##.#####.####.#",
+  "#..........................#",
+  "#.####.##.########.##.####.#",
+  "#.####.##.########.##.####.#",
+  "#......##....##....##......#",
+  "######.#####.##.#####.######",
+  "######.#####.##.#####.######",
+  "######.##..........##.######",
+  "######.##.### ####.##.######",
+  "######.##.#gggggg#.##.######",
+  "..........#gggggg#..........",
+  "######.##.#gggggg#.##.######",
+  "######.##.########.##.######",
+  "######.##..........##.######",
+  "######.##.########.##.######",
+  "######.##.########.##.######",
+  "#............##............#",
+  "#.####.#####.##.#####.####.#",
+  "#.####.#####.##.#####.####.#",
+  "#...##................##...#",
+  "###.##.##.########.##.##.###",
+  "###.##.##.########.##.##.###",
+  "#..o...##....##....##..o...#",
+  "#.##########.##.##########.#",
+  "#.##########.##.##########.#",
+  "#..........................#",
+  "############################"
 ];
-const DOOR = { c: 10, r: 8 };
+const DOOR = { c: 13, r: 12 };
 const cv = document.getElementById('c');
 const ctx = cv.getContext('2d');
 const elScore = document.getElementById('score');
@@ -111,19 +121,21 @@ let state = 0, readyT = 0, dieT = 0, lvT = 0;
 const ST = { READY: 0, PLAY: 1, DIE: 2, OVER: 3, LEVELUP: 4, PAUSE: 5 };
 const UP = { x: 0, y: -1 }, DOWN = { x: 0, y: 1 }, LEFT = { x: -1, y: 0 }, RIGHT = { x: 1, y: 0 };
 const DIRS = [UP, LEFT, DOWN, RIGHT];
-const PSTART = { c: 10, r: 17 };
+const PSTART = { c: 13, r: 23 };
 let extraGiven = false;
 const floats = [];
 
 function wallAtPac(c, r) {
-  if (c < 0 || r < 0 || c >= COLS || r >= ROWS) return true;
+  if (r < 0 || r >= ROWS) return true;
+  c = ((c % COLS) + COLS) % COLS;
   const ch = MAZE[r][c];
   if (ch === '#' || ch === 'g') return true;
   if (c === DOOR.c && r === DOOR.r) return true;
   return false;
 }
 function wallAtGhost(c, r) {
-  if (c < 0 || r < 0 || c >= COLS || r >= ROWS) return true;
+  if (r < 0 || r >= ROWS) return true;
+  c = ((c % COLS) + COLS) % COLS;
   const ch = MAZE[r][c];
   return ch === '#' || ch === 'g';
 }
@@ -134,10 +146,10 @@ const tileOf = e => ({ c: Math.floor(e.x / T), r: Math.floor(e.y / T) });
 const pac = { x: ccx(PSTART.c), y: ccx(PSTART.r), dir: { x: 0, y: 0 }, want: { x: 0, y: 0 }, speed: 72, mouth: 0, moving: false };
 
 const GHOST_DEFS = [
-  { name: 'blinky', color: '#ff0000', scatter: { c: 19, r: 1 }, start: { c: 10, r: 7 }, houseT: -1 },
-  { name: 'pinky', color: '#ffb8ff', scatter: { c: 1, r: 1 }, start: { c: 10, r: 9 }, houseT: 1 },
-  { name: 'inky', color: '#00ffff', scatter: { c: 19, r: 19 }, start: { c: 9, r: 9 }, houseT: 3 },
-  { name: 'clyde', color: '#ffb852', scatter: { c: 1, r: 19 }, start: { c: 11, r: 9 }, houseT: 5 }
+  { name: 'blinky', color: '#ff0000', scatter: { c: 25, r: 1 }, start: { c: 13, r: 11 }, houseT: -1 },
+  { name: 'pinky', color: '#ffb8ff', scatter: { c: 2, r: 1 }, start: { c: 13, r: 14 }, houseT: 1 },
+  { name: 'inky', color: '#00ffff', scatter: { c: 25, r: 29 }, start: { c: 11, r: 14 }, houseT: 3 },
+  { name: 'clyde', color: '#ffb852', scatter: { c: 2, r: 29 }, start: { c: 15, r: 14 }, houseT: 5 }
 ];
 let ghosts = [];
 
@@ -255,6 +267,10 @@ function buildWalls(color, glow) {
   return c;
 }
 
+function wrapX(e) {
+  if (e.x >= cv.width) e.x -= cv.width;
+  else if (e.x < 0) e.x += cv.width;
+}
 function snapCenter(e) {
   e.x = Math.round(e.x / T - 0.5) * T + T / 2;
   e.y = Math.round(e.y / T - 0.5) * T + T / 2;
@@ -328,10 +344,12 @@ function aiPick(g, wallFn) {
 }
 function outDecide(g) { aiPick(g, wallAtGhost); }
 function leaveDecide(g) {
-  const cx = ccx(DOOR.c), dy = ccx(DOOR.r);
+  // Finish the exit one tile above the door, in the corridor, where
+  // LEFT/RIGHT are legal; the door's own left/right neighbours are walls.
+  const cx = ccx(DOOR.c), exitY = ccx(DOOR.r - 1);
   if (Math.abs(g.x - cx) > 0.5) g.dir = { x: Math.sign(cx - g.x), y: 0 };
-  else if (g.y > dy + 0.5) g.dir = { x: 0, y: -1 };
-  else if (atCenter(g) && g.y <= dy + 0.5) {
+  else if (g.y > exitY + 0.5) g.dir = { x: 0, y: -1 };
+  else if (atCenter(g) && g.y <= exitY + 0.5) {
     g.state = 'out';
     g.dir = Math.random() < 0.5 ? LEFT : RIGHT;
     g.frightened = frightT > 0;
@@ -339,11 +357,11 @@ function leaveDecide(g) {
 }
 function enterDecide(g) {
   g.dir = { x: 0, y: 1 };
-  if (atCenter(g) && Math.abs(g.y - ccx(9)) < 0.6) {
+  if (atCenter(g) && Math.abs(g.y - ccx(14)) < 0.6) {
     g.state = 'house';
     g.houseT = 0.6;
     g.x = ccx(DOOR.c);
-    g.y = ccx(9);
+    g.y = ccx(14);
   }
 }
 
@@ -372,6 +390,7 @@ function updatePac(dt) {
   pac.moving = !!(pac.dir.x || pac.dir.y);
   if (pac.moving) {
     stepEdge(pac, pac.speed * dt);
+    wrapX(pac);
     pac.mouth += dt * 9;
   }
 }
@@ -400,12 +419,15 @@ function updateGhost(g, dt) {
     else outDecide(g);
   }
   stepEdge(g, ghostSpeed(g) * dt);
+  wrapX(g);
 }
 
 function checkCollisions() {
   for (const g of ghosts) {
     if (g.state !== 'out') continue;
-    const dx = g.x - pac.x, dy = g.y - pac.y;
+    let dx = g.x - pac.x, dy = g.y - pac.y;
+    if (dx > cv.width / 2) dx -= cv.width;
+    else if (dx < -cv.width / 2) dx += cv.width;
     if (dx * dx + dy * dy > 81) continue;
     if (g.frightened) {
       const pts = 200 * Math.pow(2, Math.min(combo, 3));
@@ -425,18 +447,19 @@ function checkCollisions() {
 }
 
 function updatePlay(dt) {
+  // Fright and the scatter/chase phase clock run independently:
+  // eating a power pellet must not extend the current phase.
   if (frightT > 0) {
     frightT -= dt;
     if (frightT <= 0) {
       frightT = 0;
       for (const g of ghosts) if (g.state === 'out') g.frightened = false;
     }
-  } else {
-    modeT -= dt;
-    if (modeT <= 0) {
-      modeIdx = Math.min(modeIdx + 1, PHASES.length - 1);
-      modeT = PHASES[modeIdx][1];
-    }
+  }
+  modeT -= dt;
+  if (modeT <= 0) {
+    modeIdx = Math.min(modeIdx + 1, PHASES.length - 1);
+    modeT = PHASES[modeIdx][1];
   }
   updatePac(dt);
   eatDot();
